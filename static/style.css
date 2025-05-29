@@ -1,0 +1,75 @@
+body {
+    background: linear-gradient(270deg, #0f0c29, #302b63, #24243e);
+    background-size: 600% 600%;
+    animation: Gradient 15s ease infinite;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    text-align: center;
+    padding: 40px;
+}
+
+@keyframes Gradient {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+.container {
+    background: rgba(0,0,0,0.6);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    margin: auto;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.titulo {
+    font-size: 2.5em;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {color: #ff0000;}
+    50% {color: #ffd700;}
+    100% {color: #ff0000;}
+}
+
+.sub {
+    margin: 10px 0 20px;
+    font-size: 1.2em;
+}
+
+.regras {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    width: 80px;
+    text-align: center;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 10px;
+    background-color: #ff0000;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #cc0000;
+}
+
+#status {
+    margin-top: 20px;
+    font-weight: bold;
+}
