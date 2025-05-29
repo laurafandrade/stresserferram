@@ -1,8 +1,10 @@
 function start() {
-    let threads = document.getElementById('threads').value;
+    const alvo = document.getElementById('alvo').value;
+    const threads = document.getElementById('threads').value;
+
     fetch('/start', {
         method: 'POST',
-        body: new URLSearchParams({'threads': threads})
+        body: new URLSearchParams({alvo: alvo, threads: threads})
     })
     .then(res => res.json())
     .then(data => {
