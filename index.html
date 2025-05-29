@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>McFly System Down</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1 class="titulo">🔥 McFly System Down 🔥</h1>
+    <p class="sub">🚀 Bem-vindo ao McFly System Down — sua ferramenta de testes de estresse em rede.</p>
+    <p class="regras">
+        ⚠️ Máximo de <b>500 threads</b>.<br>
+        ⏳ O teste roda até clicar em <b>PARAR</b>.<br>
+        🚫 Não inicie outro teste sem parar o anterior.
+    </p>
+
+    <div class="formulario">
+        <label>Threads (máx 500):</label>
+        <input type="number" id="threads" value="100">
+        <br><br>
+        <button onclick="start()">🚀 Iniciar</button>
+        <button onclick="stop()">🛑 Parar</button>
+    </div>
+
+    <div id="status"></div>
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
