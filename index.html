@@ -6,35 +6,28 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    <div class="container">
+        <h1>🔥 McFly System Down 🔥</h1>
+        <p class="sub">Bem-vindo! 🧠</p>
 
-<div class="container">
-    <h1 class="titulo">🔥 McFly System Down 🔥</h1>
-    <p class="sub">🚀 Teste de Estresse de Rede — Configuração</p>
+        <p class="regras">
+            🔒 Máximo 500 threads<br>
+            ⏳ Tempo máximo 200 segundos<br>
+            🚀 Não feche esta aba após iniciar (Render segura)<br>
+        </p>
 
-    <div class="formulario">
-        <label>URL do Alvo:</label>
-        <input type="text" id="alvo" placeholder="https://exemplo.com">
-        <br><br>
+        <div class="formulario">
+            <input type="text" id="alvo" placeholder="URL do alvo"><br>
+            <input type="number" id="threads" placeholder="Threads (até 500)"><br>
+            <input type="number" id="tempo" placeholder="Tempo em segundos (até 200)"><br><br>
 
-        <label>Threads (máx 500):</label>
-        <input type="number" id="threads" value="100">
-        <br><br>
+            <button onclick="start()">🚀 Iniciar</button>
+            <button onclick="stop()">🛑 Parar</button>
+            <a href="/logs"><button>📜 Ver Logs</button></a>
+        </div>
 
-        <label>Tempo (segundos, máx 200):</label>
-        <input type="number" id="tempo" value="60">
-        <br><br>
-
-        <button onclick="start()">🚀 Iniciar</button>
-        <button onclick="stop()">🛑 Parar</button>
+        <div id="status"></div>
     </div>
-
-    <div id="status"></div>
-
-    <div class="logs">
-        <h3>📜 Logs de Ataques</h3>
-        <ul id="log-list"></ul>
-    </div>
-</div>
 
 <script src="/static/script.js"></script>
 </body>
