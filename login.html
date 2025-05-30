@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - McFly System Down</title>
+    <link rel="stylesheet" href="/static/login.css">
+</head>
+<body>
+
+<div id="background"></div>
+
+<div class="login-container">
+    <h1 class="title">🚀 McFly System Down</h1>
+    <p class="subtitle">🔒 Área restrita</p>
+
+    <form method="POST" action="/login">
+        <label>Usuário</label>
+        <input type="text" name="username" placeholder="Digite seu usuário" required>
+
+        <label>Senha</label>
+        <div class="password-container">
+            <input type="password" name="password" id="password" placeholder="Digite sua senha" required>
+            <img id="togglePassword" src="/static/eye-close.png" alt="Mostrar senha">
+        </div>
+
+        <button type="submit">Entrar</button>
+    </form>
+</div>
+
+<script src="/static/login.js"></script>
+
+</body>
+</html>
